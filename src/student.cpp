@@ -82,7 +82,24 @@ void clear(Node*& root) {
 // =============================================================================
 
 bool insert(Node*& root, int nilai) {
-    return false;
+    if (root == nullptr) {
+        root = new Node{nilai, nullptr, nullptr};
+        return true;
+    }
+
+    Node* current = root;
+    while (true) {
+        if (nilai == current->data) {
+            return false;
+        }
+
+        Node*& next = (nilai < current->data) ? current->left : current->right;
+        if (next == nullptr) {
+            next = new Node{nilai, nullptr, nullptr};
+            return true;
+        }
+        current = next;
+    }
 }
 
 // =============================================================================
@@ -113,6 +130,13 @@ bool insert(Node*& root, int nilai) {
 // =============================================================================
 
 const Node* cari(const Node* root, int nilai) {
+    const Node* current = root;
+    while (current != nullptr) {
+        if (nilai == current->data) {
+            return current;
+        }
+        current = (nilai < current->data) ? current->left : current->right;
+    }
     return nullptr;
 }
 
@@ -146,7 +170,11 @@ const Node* cari(const Node* root, int nilai) {
 // =============================================================================
 
 const Node* minimum(const Node* root) {
-    return nullptr;
+    const Node* current = root;
+    while (current != nullptr && current->left != nullptr) {
+        current = current->left;
+    }
+    return current;
 }
 
 // =============================================================================
@@ -209,7 +237,37 @@ const Node* minimum(const Node* root) {
 // =============================================================================
 
 bool hapus(Node*& root, int nilai) {
-    return false;
+    Node** link = &root;
+    while (*link != nullptr && (*link)->data != nilai) {
+        link = (nilai < (*link)->data) ? &(*link)->left : &(*link)->right;
+    }
+
+    if (*link == nullptr) {
+        return false;
+    }
+
+    Node* target = *link;
+    if (target->left == nullptr) {
+        *link = target->right;
+        delete target;
+        return true;
+    }
+    if (target->right == nullptr) {
+        *link = target->left;
+        delete target;
+        return true;
+    }
+
+    Node** successorLink = &target->right;
+    while ((*successorLink)->left != nullptr) {
+        successorLink = &(*successorLink)->left;
+    }
+
+    Node* successor = *successorLink;
+    target->data = successor->data;
+    *successorLink = successor->right;
+    delete successor;
+    return true;
 }
 
 // =============================================================================
@@ -250,7 +308,19 @@ bool hapus(Node*& root, int nilai) {
 // =============================================================================
 
 const Node* termahalTerbeli(const Node* root, int uang) {
-    return nullptr;
+    const Node* best = nullptr;
+    const Node* current = root;
+
+    while (current != nullptr) {
+        if (current->data <= uang) {
+            best = current;
+            current = current->right;
+        } else {
+            current = current->left;
+        }
+    }
+
+    return best;
 }
 
 // =============================================================================
